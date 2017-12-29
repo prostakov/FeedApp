@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NUnit.Framework;
 
 namespace FeedLibraryTests
 {
+    [TestFixture]
     public class AtomParserTests
     {
         public const string xmlObjectString = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -25,5 +27,11 @@ namespace FeedLibraryTests
             </feed>";
 
         // TODO: Tests
+
+        [Test]
+        public void Tests()
+        {
+            Assert.IsTrue(true);
+        }
     }
 }
