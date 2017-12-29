@@ -16,22 +16,18 @@ namespace FeedApp.Controllers
         private const string _sourceLigaNet = "http://news.liga.net/all/rss.xml";
         private const string _sourceWired = "https://www.wired.com/feed/rss";
 
-        private readonly FeedExtractor _feedExtractor;
+        private readonly FeedManager _feedManager;
 
-        private readonly IMapper _mapper;
-
-        public FeedController(FeedExtractor feedExtractor, IMapper mapper)
+        public FeedController(FeedManager feedManager)
         {
-            _feedExtractor = feedExtractor ?? throw new ArgumentNullException(nameof(feedExtractor));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _feedManager = feedManager ?? throw new ArgumentNullException(nameof(feedManager));
         }
 
         // GET api/values
         [HttpGet]
-        public Feed Get()
+        public async Task<Feed> Get()
         {
-            var feed = _feedExtractor.Get(_sourceWired);
-            return _mapper.Map<FeedLibrary.Models.Feed, Feed>(feed);
+            return await _feedManager.GetFeed(_sourceWired);
         }
     }
 }

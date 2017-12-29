@@ -21,10 +21,8 @@ namespace FeedLibrary
             _feedParsers = feedParsers.ToDictionary(x => x.FeedType);
         }
 
-        public Feed Get(string feedUrl)
+        public Feed Process(XDocument document)
         {
-            var document = XDocument.Load(feedUrl);
-
             var feedType = _feedTypeParsers.First(f => f.CanParse(document)).FeedType;
 
             return _feedParsers[feedType].ParseFeed(document);
