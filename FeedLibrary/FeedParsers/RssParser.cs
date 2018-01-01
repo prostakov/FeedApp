@@ -46,9 +46,9 @@ namespace FeedLibrary.FeedParsers
             
             return new Feed
             {
-                Name = nodeElements.First(i => i.Name.LocalName == "title").Value,
-                Link = nodeElements.First(i => i.Name.LocalName == "link").Value,
-                LastUpdated = ParseDate(nodeElements.First(i => i.Name.LocalName == "lastBuildDate").Value),
+                Name = nodeElements.FirstOrDefault(i => i.Name.LocalName == "title")?.Value ?? "",
+                Link = nodeElements.FirstOrDefault(i => i.Name.LocalName == "link")?.Value ?? "",
+                LastUpdated = ParseDate(nodeElements.FirstOrDefault(i => i.Name.LocalName == "lastBuildDate")?.Value ?? ""),
                 Items = ParseFeedItems(nodeElements)
             };
         }
@@ -60,10 +60,10 @@ namespace FeedLibrary.FeedParsers
                 var entries = from item in nodeElements.Where(i => i.Name.LocalName == "item")
                     select new FeedItem
                     {
-                        Title = item.Elements().First(i => i.Name.LocalName == "title").Value,
-                        Link = item.Elements().First(i => i.Name.LocalName == "link").Value,
-                        Content = item.Elements().First(i => i.Name.LocalName == "description").Value,
-                        PublishDate = ParseDate(item.Elements().First(i => i.Name.LocalName == "pubDate").Value),
+                        Title = item.Elements().FirstOrDefault(i => i.Name.LocalName == "title")?.Value ?? "",
+                        Link = item.Elements().FirstOrDefault(i => i.Name.LocalName == "link")?.Value ?? "",
+                        Content = item.Elements().FirstOrDefault(i => i.Name.LocalName == "description")?.Value ?? "",
+                        PublishDate = ParseDate(item),
                         Media = ParseMedia(item)
                     };
                 return entries.ToList();
@@ -76,29 +76,22 @@ namespace FeedLibrary.FeedParsers
 
         private string ParseMedia(XElement item)
         {
-            var result = string.Empty;
+            bool HasMediaTagsPredicate(XElement i) =>
+                new[] {"enclosure", "thumbnail", "content"}.Contains(i.Name.LocalName);
 
-            if (item.Elements().Any(i => i.Name.LocalName == "enclosure"))
-            {
-                result = item.Elements().First(i => i.Name.LocalName == "enclosure").Attribute("url")?.Value;
-            }
-            else if (item.Elements().Any(i => i.Name.LocalName == "media:thumbnail"))
-            {
-                result = item.Elements().First(i => i.Name.LocalName == "media:thumbnail").Attribute("url")?.Value;
-            }
+            return item.Elements().FirstOrDefault(HasMediaTagsPredicate)?.Attribute("url")?.Value ?? "";
+        }
 
-            result = result ?? string.Empty;
+        private DateTime ParseDate(XElement item)
+        {
+            var dateString = item.Elements().FirstOrDefault(i => i.Name.LocalName == "pubDate")?.Value ?? "";
 
-            return result;
+            return DateTime.TryParse(dateString, out DateTime result) ? result : DateTime.MinValue;
         }
 
         private DateTime ParseDate(string date)
         {
-            DateTime result;
-            if (DateTime.TryParse(date, out result))
-                return result;
-            else
-                return DateTime.MinValue;
+            return DateTime.TryParse(date, out DateTime result) ? result : DateTime.MinValue;
         }
     }
 }
