@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="web.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FeedLibrary\FeedLibrary.csproj" />
   </ItemGroup>
 
