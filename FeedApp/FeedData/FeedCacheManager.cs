@@ -81,9 +81,14 @@ namespace FeedApp.FeedData
 
             if (feed != null)
             {
-                feed.Items = feed.Items.Union(_cache[feedUrl].Feed.Items);
+                if (_cache.TryGetValue(feedUrl, out var cachedFeedTuple) && cachedFeedTuple.Feed.Items.Any())
+                {
+                    feed.Items = feed.Items.Union(cachedFeedTuple.Feed.Items);
+                }
 
-                _cache.TryAdd(feedUrl, (Feed: feed, TimeAdded: DateTime.Now));
+                var newFeedTuple = (Feed: feed, TimeAdded: DateTime.Now);
+
+                _cache.AddOrUpdate(feedUrl, newFeedTuple, (key, oldFeedTuple) => newFeedTuple);
             }
         }
 
