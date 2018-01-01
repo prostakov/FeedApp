@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
+using FeedApp.FeedData;
 using FeedApp.Models;
 using FeedLibrary;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +15,25 @@ namespace FeedApp.Controllers
     [Route("api/feed")]
     public class FeedController : Controller
     {
-        private const string _sourceLigaNet = "http://news.liga.net/all/rss.xml";
-        private const string _sourceWired = "https://www.wired.com/feed/rss";
-
         private readonly FeedManager _feedManager;
 
-        public FeedController(FeedManager feedManager)
+        private readonly IMapper _mapper;
+
+        public FeedController(FeedManager feedManager, IMapper mapper)
         {
             _feedManager = feedManager ?? throw new ArgumentNullException(nameof(feedManager));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         // GET api/values
         [HttpGet]
-        public async Task<Feed> Get()
+        public IEnumerable<Feed> Get()
         {
-            return await _feedManager.GetFeed(_sourceWired);
+            var sources = System.IO.File.ReadAllLines("rss_feeds.txt");
+
+            var feeds = _feedManager.Get(sources);
+
+            return _mapper.Map<IEnumerable<FeedLibrary.Models.Feed>, IEnumerable<Feed>>(feeds.Values);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FeedApp.FeedData;
 using FeedLibrary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,8 @@ namespace FeedApp
             services.AddAutoMapper();
 
             services.AddFeedLibraryDependencies();
-
+            
+            services.AddSingleton<FeedCacheManager>();
             services.AddSingleton<FeedManager>();
         }
 
