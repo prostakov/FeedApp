@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using FeedLibrary;
 using FeedLibrary.Models;
 
-namespace FeedApp.FeedData
+namespace FeedApp.Data
 {
     public class FeedCacheManager
     {

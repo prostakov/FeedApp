@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
-using FeedApp.FeedData;
+using FeedApp.Data;
 using FeedApp.Models;
 using FeedLibrary;
 using Microsoft.AspNetCore.Mvc;

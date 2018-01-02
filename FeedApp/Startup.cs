@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FeedApp.FeedData;
+using FeedApp.Data;
 using FeedLibrary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
