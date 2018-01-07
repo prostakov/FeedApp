@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using FeedApp.Data;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
@@ -8,7 +9,9 @@ namespace FeedApp
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            BuildWebHost(args)
+                .Seed()
+                .Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
