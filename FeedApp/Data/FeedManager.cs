@@ -1,29 +1,34 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using AutoMapper;
 using FeedLibrary;
-using FeedLibrary.Models;
 
 namespace FeedApp.Data
 {
     public class FeedManager
     {
-        private readonly FeedCacheManager _cacheManager;
+        private readonly FeedExtractor _feedExtractor;
 
-        public FeedManager(FeedCacheManager cacheManager)
+        private readonly ConcurrentDictionary<string, (FeedLibrary.Models.Feed Feed, DateTime TimeAdded)> _cache =
+            new ConcurrentDictionary<string, (FeedLibrary.Models.Feed Feed, DateTime TimeAdded)>();
+
+        private const int CacheExpirationPeriodMinutes = 20;
+
+        public FeedManager(FeedExtractor feedExtractor)
         {
-            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
-            Task.Factory.StartNew(_cacheManager.LazyUpdate);
+            _feedExtractor = feedExtractor ?? throw new ArgumentNullException(nameof(feedExtractor));
         }
 
-        public ConcurrentDictionary<string, Feed> Get(string[] feedUrls)
+        public IDictionary<string, FeedLibrary.Models.Feed> Get(string[] feedUrls)
         {
-            var feeds = new ConcurrentDictionary<string, Feed>();
+            //return feedUrls.AsParallel()
+            //    .Select(feedUrl => new { url = feedUrl, feed = Get(feedUrl) })
+            //    .Where(x => x.feed != null)
+            //    .ToDictionary(x => x.url, x => x.feed);
+
+            var feeds = new ConcurrentDictionary<string, FeedLibrary.Models.Feed>();
 
             Parallel.ForEach(feedUrls, feedUrl =>
             {
@@ -38,17 +43,48 @@ namespace FeedApp.Data
             return feeds;
         }
 
-        private Feed Get(string feedUrl)
+        private FeedLibrary.Models.Feed Get(string feedUrl)
         {
-            if (_cacheManager.CacheContains(feedUrl))
-            {
-                _cacheManager.ScheduleLazyUpdate(feedUrl);
+            return _cache.ContainsKey(feedUrl) && !CacheItemExpired(feedUrl)
+                ? GetFromCache(feedUrl)
+                : LoadAndCache(feedUrl);
+        }
 
-                return _cacheManager.GetFromCache(feedUrl);
-            }
-            else
+        private bool CacheItemExpired(string feedUrl)
+        {
+            return _cache.TryGetValue(feedUrl, out var feedTuple) &&
+                   (DateTime.Now - feedTuple.TimeAdded).Minutes > CacheExpirationPeriodMinutes;
+        }
+
+        private FeedLibrary.Models.Feed GetFromCache(string feedUrl)
+        {
+            return _cache.TryGetValue(feedUrl, out var value) ? value.Feed : null;
+        }
+
+        private FeedLibrary.Models.Feed LoadAndCache(string feedUrl)
+        {
+            var feed = LoadFeed(feedUrl);
+
+            if (feed != null)
             {
-                return _cacheManager.LoadAndCache(feedUrl);
+                var newTuple = (Feed: feed, TimeAdded: DateTime.Now);
+                _cache.AddOrUpdate(feedUrl, newTuple, (s, oldTuple) => newTuple);
+            }
+
+            return feed;
+        }
+
+        private FeedLibrary.Models.Feed LoadFeed(string feedUrl)
+        {
+            try
+            {
+                var document = XDocument.Load(feedUrl);
+
+                return _feedExtractor.Process(document);
+            }
+            catch
+            {
+                return null;
             }
         }
     }
