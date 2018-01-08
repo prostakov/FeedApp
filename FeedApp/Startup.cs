@@ -6,6 +6,7 @@ using FeedApp.Models;
 using FeedLibrary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -84,6 +85,11 @@ namespace FeedApp
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             app.UseMiddleware<DefaultUserRequestTokenMiddleware>();
             app.UseStaticFiles();
