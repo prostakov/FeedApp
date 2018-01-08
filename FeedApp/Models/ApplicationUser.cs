@@ -8,5 +8,6 @@ namespace FeedApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        public ICollection<FeedCollection> FeedCollections { get; set; }
     }
 }

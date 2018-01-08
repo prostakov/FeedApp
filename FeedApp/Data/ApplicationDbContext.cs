@@ -18,6 +18,8 @@ namespace FeedApp.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            new FeedCollectionConfiguration(builder.Entity<FeedCollection>());
         }
     }
 }
