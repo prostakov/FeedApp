@@ -15,6 +15,8 @@ namespace FeedApp.Data
         {
         }
 
+        public DbSet<FeedCollection> FeedCollections { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

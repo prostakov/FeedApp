@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FeedApp.Models;
+using FeedApp.Models.ResourceModels;
 
 namespace FeedApp
 {
@@ -9,6 +10,8 @@ namespace FeedApp
         {
             CreateMap<FeedLibrary.Models.Feed, Feed>();
             CreateMap<FeedLibrary.Models.FeedItem, FeedItem>();
+
+            CreateMap<FeedCollection, FeedCollectionResource>();
         }
     }
 }

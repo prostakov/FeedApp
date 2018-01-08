@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FeedApp.Data;
 using FeedApp.Models;
-using FeedApp.Models.Requests;
+using FeedApp.Models.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

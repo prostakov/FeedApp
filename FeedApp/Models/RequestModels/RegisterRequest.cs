@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FeedApp.Models.Requests
+namespace FeedApp.Models.RequestModels
 {
     public class RegisterRequest
     {
