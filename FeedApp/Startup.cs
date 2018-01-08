@@ -26,9 +26,10 @@ namespace FeedApp
         
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
+            services.Configure<Config>(Configuration);
 
             services.AddIdentity<ApplicationUser, IdentityRole>(config =>
                 {
@@ -36,11 +37,9 @@ namespace FeedApp
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-            // Configure Identity
+            
             services.Configure<IdentityOptions>(options =>
             {
-                // Password settings
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
@@ -64,6 +63,8 @@ namespace FeedApp
                     ClockSkew = TimeSpan.FromMinutes(5)
                 };
             });
+
+            services.AddSingleton<AuthenticationTokenProvider>();
 
             services.AddMvc();
 
