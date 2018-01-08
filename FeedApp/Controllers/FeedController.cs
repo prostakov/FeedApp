@@ -29,7 +29,7 @@ namespace FeedApp.Controllers
         [HttpGet]
         public IEnumerable<Feed> Get()
         {
-            var sources = System.IO.File.ReadAllLines("rss_feeds.txt");
+            var sources = System.IO.File.ReadAllLines("rss_test_feeds.txt");
 
             var feeds = _feedManager.Get(sources);
 
