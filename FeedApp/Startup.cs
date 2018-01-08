@@ -33,7 +33,7 @@ namespace FeedApp
 
             services.AddIdentity<ApplicationUser, IdentityRole>(config =>
                 {
-                    config.SignIn.RequireConfirmedEmail = true;
+                    config.SignIn.RequireConfirmedEmail = false;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -85,6 +85,7 @@ namespace FeedApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<DefaultUserRequestTokenMiddleware>();
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
