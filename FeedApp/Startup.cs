@@ -86,8 +86,8 @@ namespace FeedApp
             }
 
             app.UseStaticFiles();
-            app.UseMvc();
             app.UseAuthentication();
+            app.UseMvc();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
