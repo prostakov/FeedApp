@@ -42,7 +42,6 @@ namespace FeedApp.Controllers
         }
 
         /*
-         TODO:  Add: implement validation for given url of feed
          TODO:  Update - updates FeedLabel name or uri
          TODO:  Remove - removes feed from collection
          TODO:  GetFeed - fetches feed for FeedLabel
@@ -58,6 +57,11 @@ namespace FeedApp.Controllers
 
             if (feedCollection.User.Id == user.Id)
             {
+                if (_feedManager.Get(url) == null)
+                {
+                    return new BadRequestObjectResult("Could not load the feed!");
+                }
+
                 var feed = new FeedLabel
                 {
                     FeedCollectionId = feedCollectionId,

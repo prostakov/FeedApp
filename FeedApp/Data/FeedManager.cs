@@ -43,7 +43,7 @@ namespace FeedApp.Data
             return feeds;
         }
 
-        private FeedLibrary.Models.Feed Get(string feedUrl)
+        public FeedLibrary.Models.Feed Get(string feedUrl)
         {
             return _cache.ContainsKey(feedUrl) && !CacheItemExpired(feedUrl)
                 ? GetFromCache(feedUrl)
