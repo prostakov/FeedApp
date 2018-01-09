@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using AutoMapper;
 using FeedApp.Data;
 using FeedApp.Models;
 using FeedApp.Models.RequestModels;
-using FeedLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FeedApp.Controllers
 {
+    [Authorize]
     [Route("api/feeds")]
     public class FeedsController : MyController
     {
@@ -33,7 +31,6 @@ namespace FeedApp.Controllers
         }
         
         /*
-         TODO:  Remove - removes feed from collection
          TODO:  GetFeed - fetches feed for FeedLabel
          TODO:  GetCollectionFeed - fetches all feeds for given collection
          */
@@ -95,6 +92,30 @@ namespace FeedApp.Controllers
 
                     feed.Name = string.IsNullOrEmpty(request.Name) ? feed.Name : request.Name;
                     feed.Url = string.IsNullOrEmpty(request.Url) ? feed.Url : request.Url;
+
+                    return SaveDbChanges();
+                }
+
+                return Forbid();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(Guid feedLabelId)
+        {
+            var feed = _dbContext.FeedLabels
+                .Include(f => f.FeedCollection)
+                .FirstOrDefault(f => f.Id == feedLabelId);
+
+            if (feed != null)
+            {
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+                if (feed.FeedCollection.UserId == user.Id)
+                {
+                    _dbContext.FeedLabels.Remove(feed);
 
                     return SaveDbChanges();
                 }
