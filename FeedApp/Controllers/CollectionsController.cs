@@ -43,13 +43,13 @@ namespace FeedApp.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Create(string feedCollectionName)
+        public async Task<IActionResult> Create(string collectionName)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
             var feedCollection = new FeedCollection
             {
-                Name = feedCollectionName,
+                Name = collectionName,
                 UserId = user.Id,
                 DateAdded = DateTime.Now
             };
@@ -69,6 +69,23 @@ namespace FeedApp.Controllers
             if (feedCollection.User.Id == user.Id)
             {
                 feedCollection.Name = name;
+
+                return SaveDbChanges();
+            }
+
+            return new ForbidResult();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(Guid collectionId)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var feedCollection = await _dbContext.FeedCollections.FindAsync(collectionId);
+
+            if (feedCollection.User.Id == user.Id)
+            {
+                _dbContext.FeedCollections.Remove(feedCollection);
 
                 return SaveDbChanges();
             }
