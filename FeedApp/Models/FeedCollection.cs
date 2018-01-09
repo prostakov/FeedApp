@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -16,6 +17,8 @@ namespace FeedApp.Models
         public ApplicationUser User { get; set; }
 
         public DateTime DateAdded { get; set; }
+
+        public ICollection<FeedLabel> Feeds { get; set; }
     }
 
     public class FeedCollectionConfiguration
@@ -36,6 +39,11 @@ namespace FeedApp.Models
             builder.HasOne(p => p.User)
                 .WithMany(u => u.FeedCollections)
                 .HasForeignKey(p => p.UserId)
+                .IsRequired();
+
+            builder.HasMany(p => p.Feeds)
+                .WithOne(f => f.FeedCollection)
+                .HasForeignKey(f => f.FeedCollectionId)
                 .IsRequired();
         }
     }
