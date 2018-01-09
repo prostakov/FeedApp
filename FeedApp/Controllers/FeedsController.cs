@@ -33,12 +33,11 @@ namespace FeedApp.Controllers
         }
         
         /*
-         TODO:  Update - updates FeedLabel name or uri
          TODO:  Remove - removes feed from collection
          TODO:  GetFeed - fetches feed for FeedLabel
          TODO:  GetCollectionFeed - fetches all feeds for given collection
          */
-
+            
         [HttpPost]
         [ValidateRequest]
         public async Task<IActionResult> Create(CreateFeedLabelRequest request)
@@ -47,35 +46,41 @@ namespace FeedApp.Controllers
 
             var feedCollection = await _dbContext.FeedCollections.FindAsync(request.FeedCollectionId);
 
-            if (feedCollection.User.Id == user.Id)
+            if (feedCollection != null)
             {
-                if (_feedManager.Get(request.Url) == null)
+                if (feedCollection.User.Id == user.Id)
                 {
-                    return new BadRequestObjectResult("Could not load the feed!");
+                    if (_feedManager.Get(request.Url) == null)
+                    {
+                        return BadRequest("Could not load the feed!");
+                    }
+
+                    var feed = new FeedLabel
+                    {
+                        FeedCollectionId = request.FeedCollectionId,
+                        Name = request.Name,
+                        Url = request.Url,
+                        DateAdded = DateTime.Now
+                    };
+
+                    _dbContext.FeedLabels.Add(feed);
+
+                    return SaveDbChanges();
                 }
 
-                var feed = new FeedLabel
-                {
-                    FeedCollectionId = request.FeedCollectionId,
-                    Name = request.Name,
-                    Url = request.Url,
-                    DateAdded = DateTime.Now
-                };
-
-                _dbContext.FeedLabels.Add(feed);
-
-                return SaveDbChanges();
+                return Forbid();
             }
 
-            return Forbid();
+            return BadRequest();
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(Guid feedLabelId, string name, string url)
+        [ValidateRequest]
+        public async Task<IActionResult> Update(UpdateFeedLabelRequest request)
         {
             var feed = _dbContext.FeedLabels
                 .Include(f => f.FeedCollection)
-                .FirstOrDefault(f => f.Id == feedLabelId);
+                .FirstOrDefault(f => f.Id == request.FeedLabelId);
 
             if (feed != null)
             {
@@ -83,7 +88,15 @@ namespace FeedApp.Controllers
 
                 if (feed.FeedCollection.UserId == user.Id)
                 {
-                    
+                    if (!string.IsNullOrEmpty(request.Url) && _feedManager.Get(request.Url) == null)
+                    {
+                        return BadRequest("Could not load the feed!");
+                    }
+
+                    feed.Name = string.IsNullOrEmpty(request.Name) ? feed.Name : request.Name;
+                    feed.Url = string.IsNullOrEmpty(request.Url) ? feed.Url : request.Url;
+
+                    return SaveDbChanges();
                 }
 
                 return Forbid();

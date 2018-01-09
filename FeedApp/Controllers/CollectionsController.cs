@@ -70,14 +70,19 @@ namespace FeedApp.Controllers
             var feedCollection = await _dbContext.FeedCollections
                 .Include(f => f.User).FirstOrDefaultAsync(f => f.Id == request.Id);
 
-            if (feedCollection.User.Id == user.Id)
+            if (feedCollection != null)
             {
-                feedCollection.Name = request.Name;
+                if (feedCollection.User.Id == user.Id)
+                {
+                    feedCollection.Name = request.Name;
 
-                return SaveDbChanges();
+                    return SaveDbChanges();
+                }
+
+                return Forbid();
             }
 
-            return Forbid();
+            return BadRequest();
         }
 
         [HttpDelete]
@@ -88,14 +93,19 @@ namespace FeedApp.Controllers
             var feedCollection = await _dbContext.FeedCollections
                 .Include(f => f.User).FirstOrDefaultAsync(f => f.Id == collectionId);
 
-            if (feedCollection.User.Id == user.Id)
+            if (feedCollection != null)
             {
-                _dbContext.FeedCollections.Remove(feedCollection);
+                if (feedCollection.User.Id == user.Id)
+                {
+                    _dbContext.FeedCollections.Remove(feedCollection);
 
-                return SaveDbChanges();
+                    return SaveDbChanges();
+                }
+
+                return Forbid();
             }
 
-            return Forbid();
+            return BadRequest();
         }
     }
 }
