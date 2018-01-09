@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FeedApp.Data;
 using FeedApp.Models;
+using FeedApp.Models.FeedModels;
 using FeedApp.Models.RequestModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,11 +31,6 @@ namespace FeedApp.Controllers
             _feedManager = feedManager ?? throw new ArgumentNullException(nameof(feedManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        
-        /*
-         TODO:  GetFeed - fetches feed for FeedLabel
-         TODO:  GetCollectionFeed - fetches all feeds for given collection
-         */
             
         [HttpPost]
         [ValidateRequest]
@@ -124,6 +121,54 @@ namespace FeedApp.Controllers
             }
 
             return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("feed")]
+        public async Task<IEnumerable<FeedItem>> GetFeed(Guid feedLabelId)
+        {
+            var feed = _dbContext.FeedLabels
+                .Include(f => f.FeedCollection)
+                .FirstOrDefault(f => f.Id == feedLabelId);
+
+            if (feed != null)
+            {
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+                if (feed.FeedCollection.UserId == user.Id)
+                {
+                    var feedItems = _feedManager.Get(feed.Url).Items;
+
+                    return _mapper.Map<IEnumerable<FeedLibrary.Models.FeedItem>, IEnumerable<FeedItem>>(feedItems);
+                }
+            }
+
+            return new List<FeedItem>();
+        }
+
+        [HttpGet]
+        [Route("collection")]
+        public async Task<IEnumerable<FeedItem>> GetCollectionFeed(Guid feedCollectionId)
+        {
+            var feedCollection = _dbContext.FeedCollections
+                .Include(f => f.Feeds)
+                .FirstOrDefault(f => f.Id == feedCollectionId);
+
+            if (feedCollection != null)
+            {
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+                if (feedCollection.UserId == user.Id)
+                {
+                    var feeds = _feedManager.Get(feedCollection.Feeds.Select(f => f.Url).ToArray());
+
+                    var feedItems = feeds.Values.SelectMany(f => f.Items).OrderBy(i => i.PublishDate);
+
+                    return _mapper.Map<IEnumerable<FeedLibrary.Models.FeedItem>, IEnumerable<FeedItem>>(feedItems);
+                }
+            }
+
+            return new List<FeedItem>();
         }
     }
 }
