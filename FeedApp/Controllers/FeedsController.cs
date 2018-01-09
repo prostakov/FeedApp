@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace FeedApp.Controllers
 {
     [Route("api/feed")]
-    public class FeedController : Controller
+    public class FeedsController : Controller
     {
         private readonly FeedManager _feedManager;
 
         private readonly IMapper _mapper;
 
-        public FeedController(FeedManager feedManager, IMapper mapper)
+        public FeedsController(FeedManager feedManager, IMapper mapper)
         {
             _feedManager = feedManager ?? throw new ArgumentNullException(nameof(feedManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
