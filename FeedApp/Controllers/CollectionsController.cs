@@ -16,18 +16,15 @@ namespace FeedApp.Controllers
 {
     [Authorize]
     [Route("/api/collections")]
-    public class CollectionsController : Controller
+    public class CollectionsController : MyController
     {
-        private readonly ApplicationDbContext _dbContext;
-
         private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly IMapper _mapper;
 
         public CollectionsController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager,
-            IMapper mapper)
+            IMapper mapper) : base(dbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
@@ -37,7 +34,10 @@ namespace FeedApp.Controllers
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            var feedCollections = _dbContext.FeedCollections.Where(f => f.UserId == user.Id).OrderBy(f => f.DateAdded);
+            var feedCollections = _dbContext.FeedCollections
+                .Include(f => f.Feeds)
+                .Where(f => f.UserId == user.Id)
+                .OrderBy(f => f.DateAdded);
 
             return _mapper.Map<IEnumerable<FeedCollection>, IEnumerable<FeedCollectionResource>>(feedCollections);
         }
@@ -91,20 +91,6 @@ namespace FeedApp.Controllers
             }
 
             return new ForbidResult();
-        }
-
-        private IActionResult SaveDbChanges()
-        {
-            try
-            {
-                _dbContext.SaveChanges();
-
-                return new OkResult();
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
         }
     }
 }

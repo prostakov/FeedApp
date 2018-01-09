@@ -12,6 +12,7 @@ namespace FeedApp
             CreateMap<FeedLibrary.Models.FeedItem, FeedItem>();
 
             CreateMap<FeedCollection, FeedCollectionResource>();
+            CreateMap<FeedLabel, FeedLabelResource>();
         }
     }
 }
