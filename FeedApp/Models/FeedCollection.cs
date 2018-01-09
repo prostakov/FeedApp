@@ -8,9 +8,14 @@ namespace FeedApp.Models
     public class FeedCollection
     {
         public Guid Id { get; set; }
+
         public string Name { get; set; }
+
         public string UserId { get; set; }
+
         public ApplicationUser User { get; set; }
+
+        public DateTime DateAdded { get; set; }
     }
 
     public class FeedCollectionConfiguration
@@ -23,6 +28,9 @@ namespace FeedApp.Models
 
             builder.Property(p => p.Name)
                 .HasMaxLength(255)
+                .IsRequired();
+
+            builder.Property(p => p.DateAdded)
                 .IsRequired();
 
             builder.HasOne(p => p.User)

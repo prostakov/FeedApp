@@ -37,7 +37,7 @@ namespace FeedApp.Controllers
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            var feedCollections = _dbContext.FeedCollections.Where(f => f.UserId == user.Id);
+            var feedCollections = _dbContext.FeedCollections.Where(f => f.UserId == user.Id).OrderByDescending(f => f.DateAdded);
 
             return _mapper.Map<IEnumerable<FeedCollection>, IEnumerable<FeedCollectionResource>>(feedCollections);
         }
@@ -50,7 +50,8 @@ namespace FeedApp.Controllers
             var feedCollection = new FeedCollection
             {
                 Name = feedCollectionName,
-                UserId = user.Id
+                UserId = user.Id,
+                DateAdded = DateTime.Now
             };
 
             _dbContext.FeedCollections.Add(feedCollection);
