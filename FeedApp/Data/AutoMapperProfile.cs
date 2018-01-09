@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FeedApp.Models;
+using FeedApp.Models.FeedModels;
 using FeedApp.Models.ResourceModels;
 
 namespace FeedApp

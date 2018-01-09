@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FeedApp.Models
+namespace FeedApp.Models.FeedModels
 {
     public class Feed
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FeedApp.Models
+namespace FeedApp.Models.FeedModels
 {
     public class FeedItem
     {

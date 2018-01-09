@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using AutoMapper;
 using FeedApp.Data;
-using FeedApp.Models;
-using FeedLibrary;
+using FeedApp.Models.FeedModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FeedApp.Controllers
