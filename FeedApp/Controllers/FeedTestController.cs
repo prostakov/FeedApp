@@ -12,14 +12,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FeedApp.Controllers
 {
-    [Route("api/feeds")]
-    public class FeedsController : Controller
+    [Route("api/feedtest")]
+    public class FeedTestController : Controller
     {
         private readonly FeedManager _feedManager;
 
         private readonly IMapper _mapper;
 
-        public FeedsController(FeedManager feedManager, IMapper mapper)
+        public FeedTestController(FeedManager feedManager, IMapper mapper)
         {
             _feedManager = feedManager ?? throw new ArgumentNullException(nameof(feedManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -35,13 +35,5 @@ namespace FeedApp.Controllers
 
             return _mapper.Map<IEnumerable<FeedLibrary.Models.Feed>, IEnumerable<Feed>>(feeds.Values);
         }
-
-        /*
-         TODO:  Add - adds feed to collection + also implement validation for given url of feed
-         TODO:  Update - updates FeedLabel name or uri
-         TODO:  Remove - removes feed from collection
-         TODO:  GetFeed - fetches feed for FeedLabel
-         TODO:  GetCollectionFeed - fetches all feeds for given collection
-         */
     }
 }
