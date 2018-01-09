@@ -5,7 +5,6 @@ using FeedApp.Models;
 using FeedApp.Models.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FeedApp.Controllers
 {
@@ -22,7 +21,7 @@ namespace FeedApp.Controllers
         }
 
         [HttpPost]
-        [ValidateModel]
+        [ValidateRequest]
         [Route("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -40,7 +39,7 @@ namespace FeedApp.Controllers
         }
 
         [HttpPost]
-        [ValidateModel]
+        [ValidateRequest]
         [Route("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -54,17 +53,6 @@ namespace FeedApp.Controllers
             }
 
             return new BadRequestObjectResult("Combination of entered user/password does not exist!");
-        }
-    }
-
-    public class ValidateModelAttribute : ActionFilterAttribute
-    {
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            if (!context.ModelState.IsValid)
-            {
-                context.Result = new BadRequestObjectResult(context.ModelState);
-            }
         }
     }
 }

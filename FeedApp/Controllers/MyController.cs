@@ -22,11 +22,11 @@ namespace FeedApp.Controllers
             {
                 _dbContext.SaveChanges();
 
-                return new OkResult();
+                return Ok();
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(e.Message);
+                return BadRequest(e.Message);
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FeedApp.Data;
 using FeedApp.Models;
+using FeedApp.Models.RequestModels;
 using FeedApp.Models.ResourceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -43,13 +44,14 @@ namespace FeedApp.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Create(string collectionName)
+        [ValidateRequest]
+        public async Task<IActionResult> Create(CreateFeedCollectionRequest request)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
             var feedCollection = new FeedCollection
             {
-                Name = collectionName,
+                Name = request.Name,
                 UserId = user.Id,
                 DateAdded = DateTime.Now
             };
@@ -60,20 +62,22 @@ namespace FeedApp.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(Guid collectionId, string name)
+        [ValidateRequest]
+        public async Task<IActionResult> Update(UpdateFeedCollectionRequest request)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            var feedCollection = await _dbContext.FeedCollections.FindAsync(collectionId);
+            var feedCollection = await _dbContext.FeedCollections
+                .Include(f => f.User).FirstOrDefaultAsync(f => f.Id == request.Id);
 
             if (feedCollection.User.Id == user.Id)
             {
-                feedCollection.Name = name;
+                feedCollection.Name = request.Name;
 
                 return SaveDbChanges();
             }
 
-            return new ForbidResult();
+            return Forbid();
         }
 
         [HttpDelete]
@@ -81,7 +85,8 @@ namespace FeedApp.Controllers
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            var feedCollection = await _dbContext.FeedCollections.FindAsync(collectionId);
+            var feedCollection = await _dbContext.FeedCollections
+                .Include(f => f.User).FirstOrDefaultAsync(f => f.Id == collectionId);
 
             if (feedCollection.User.Id == user.Id)
             {
@@ -90,7 +95,7 @@ namespace FeedApp.Controllers
                 return SaveDbChanges();
             }
 
-            return new ForbidResult();
+            return Forbid();
         }
     }
 }
