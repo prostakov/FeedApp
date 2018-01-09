@@ -56,6 +56,28 @@ namespace FeedApp.Controllers
 
             _dbContext.FeedCollections.Add(feedCollection);
 
+            return SaveDbChanges();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(Guid collectionId, string name)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var feedCollection = await _dbContext.FeedCollections.FindAsync(collectionId);
+
+            if (feedCollection.User.Id == user.Id)
+            {
+                feedCollection.Name = name;
+
+                return SaveDbChanges();
+            }
+
+            return new ForbidResult();
+        }
+
+        private IActionResult SaveDbChanges()
+        {
             try
             {
                 _dbContext.SaveChanges();
@@ -66,7 +88,6 @@ namespace FeedApp.Controllers
             {
                 return new BadRequestObjectResult(e.Message);
             }
-            
         }
     }
 }
