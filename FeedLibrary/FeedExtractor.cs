@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using FeedLibrary.FeedParsers;
 using FeedLibrary.Models;
 
+[assembly: InternalsVisibleTo("FeedLibraryTests")]
 namespace FeedLibrary
 {
     public class FeedExtractor
@@ -15,7 +17,7 @@ namespace FeedLibrary
 
         private readonly IEnumerable<IFeedTypeParser> _feedTypeParsers;
 
-        public FeedExtractor(IEnumerable<IFeedParser> feedParsers, IEnumerable<IFeedTypeParser> feedTypeParsers)
+        public FeedExtractor(IEnumerable<IFeedTypeParser> feedTypeParsers, IEnumerable<IFeedParser> feedParsers)
         {
             _feedTypeParsers = feedTypeParsers;
             _feedParsers = feedParsers.ToDictionary(x => x.FeedType);
